@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(python -m py_compile:*)",
+      "Bash(python3:*)",
+      "Bash(python3 -m py_compile:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(scp:*)",
+      "Bash(ssh root@157.245.51.118 \"cat /etc/systemd/system/fortigate-dashboard.service\")",
+      "Bash(ssh root@157.245.51.118 \"ls -la /opt/fortigate-dashboard/\")",
+      "Bash(ssh:*)",
+      "Bash(curl -X POST \"http://157.245.51.118:8000/api/login\" -F \"username=admin\" -F \"password=admin123\")",
+      "Bash(curl:*)"
+    ]
+  }
+}
