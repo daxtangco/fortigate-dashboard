@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Shield } from 'lucide-react';
+import { API_URL } from '../config';
 import '../styles.css';
 
 const Login = ({ onLogin }) => {
@@ -18,7 +19,7 @@ const Login = ({ onLogin }) => {
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await fetch('https://157.245.51.118/api/login', {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         body: formData,
       });

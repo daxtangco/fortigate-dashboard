@@ -8,10 +8,8 @@ import ExpandableTopList from './components/ExpandableTopList';
 import TrafficChart from './components/TrafficChart';
 import Login from './components/Login';
 import FirewallSelector from './components/FirewallSelector';
+import { API_URL, WS_URL } from './config';
 import './styles.css';
-
-const WS_URL = 'ws://localhost:8000/ws';
-const API_URL = 'http://localhost:8000';
 
 // Helper to get stored firewall from localStorage
 const getStoredFirewall = () => {
