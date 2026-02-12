@@ -21,12 +21,8 @@ const useWebSocket = (url, token, firewallId) => {
 
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
-  const pingIntervalRef = useRef(null);
   const isPausedRef = useRef(false);
   const paramsRef = useRef({ url: null, token: null, firewallId: null });
-
-  // Detect Safari
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   // Store latest params in ref to avoid stale closures
   paramsRef.current = { url, token, firewallId };
@@ -52,27 +48,12 @@ const useWebSocket = (url, token, firewallId) => {
     ws.onopen = () => {
       setIsConnected(true);
       setIsConnecting(false);
-
-      // Safari needs regular pings to keep connection alive
-      if (isSafari) {
-        pingIntervalRef.current = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'ping' }));
-          }
-        }, 15000); // Ping every 15 seconds
-      }
     };
 
     ws.onclose = (event) => {
       wsRef.current = null;
       setIsConnected(false);
       setIsConnecting(false);
-
-      // Clear Safari ping interval
-      if (pingIntervalRef.current) {
-        clearInterval(pingIntervalRef.current);
-        pingIntervalRef.current = null;
-      }
 
       // Reconnect if not a clean close and params are still valid
       const { url, token, firewallId } = paramsRef.current;
@@ -129,7 +110,7 @@ const useWebSocket = (url, token, firewallId) => {
         const isBlocked = ['deny', 'block', 'drop', 'blocked'].includes(log.action);
         const isAllowed = ['accept', 'allow', 'pass', 'passthrough'].includes(log.action);
 
-        setLogs(prev => [log, ...prev].slice(0, 500));
+        setLogs(prev => [log, ...prev].slice(0, 1000));
 
         setStats(prev => ({
           ...prev,
@@ -181,10 +162,6 @@ const useWebSocket = (url, token, firewallId) => {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
-    if (pingIntervalRef.current) {
-      clearInterval(pingIntervalRef.current);
-      pingIntervalRef.current = null;
-    }
     if (wsRef.current) {
       wsRef.current.onclose = null; // Prevent reconnect
       wsRef.current.close();
@@ -206,28 +183,6 @@ const useWebSocket = (url, token, firewallId) => {
       // Only disconnect on unmount if params become invalid
     };
   }, [url, token, firewallId, connect, disconnect]);
-
-  // Safari: Reconnect when tab becomes visible again
-  useEffect(() => {
-    if (!isSafari) return;
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        const { url, token, firewallId } = paramsRef.current;
-        if (url && token && firewallId) {
-          // Check if connection is dead and reconnect
-          if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-            connect();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isSafari, connect]);
 
   // Cleanup on unmount
   useEffect(() => {

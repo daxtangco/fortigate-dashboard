@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     syslog_port: int = 5514
     
     # Server
-    app_host: str = "0.0.0.0"
+    app_host: str = "127.0.0.1"
     app_port: int = 8000
     debug: bool = True
     

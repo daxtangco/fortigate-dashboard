@@ -4,8 +4,9 @@ import { Search, Filter } from 'lucide-react';
 const LogTable = ({ logs }) => {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [viewLimit, setViewLimit] = useState(100);
 
-  const filteredLogs = logs.filter(log => {
+  const matchedLogs = logs.filter(log => {
     // Filter by action
     if (filter === 'allow' && !['accept', 'allow', 'pass', 'passthrough'].includes(log.action)) {
       return false;
@@ -21,9 +22,9 @@ const LogTable = ({ logs }) => {
       const dstip = (log.dstip || '').toLowerCase();
       const hostname = (log.hostname || '').toLowerCase();
       const url = (log.url || '').toLowerCase();
-      
-      if (!srcip.includes(searchLower) && 
-          !dstip.includes(searchLower) && 
+
+      if (!srcip.includes(searchLower) &&
+          !dstip.includes(searchLower) &&
           !hostname.includes(searchLower) &&
           !url.includes(searchLower)) {
         return false;
@@ -32,6 +33,8 @@ const LogTable = ({ logs }) => {
 
     return true;
   });
+
+  const filteredLogs = matchedLogs.slice(0, viewLimit);
 
   const getActionClass = (action) => {
     if (['accept', 'allow', 'pass', 'passthrough'].includes(action)) {
@@ -64,6 +67,16 @@ const LogTable = ({ logs }) => {
               <option value="all">All Actions</option>
               <option value="allow">Allowed</option>
               <option value="block">Blocked</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <select value={viewLimit} onChange={(e) => setViewLimit(Number(e.target.value))}>
+              <option value={50}>Show 50</option>
+              <option value={100}>Show 100</option>
+              <option value={200}>Show 200</option>
+              <option value={300}>Show 300</option>
+              <option value={500}>Show 500</option>
+              <option value={1000}>Show All (1000)</option>
             </select>
           </div>
           <div className="search-group">
@@ -118,7 +131,7 @@ const LogTable = ({ logs }) => {
       </div>
       
       <div className="log-table-footer">
-        Showing {filteredLogs.length} of {logs.length} logs
+        Showing {filteredLogs.length} of {matchedLogs.length} matched ({logs.length} total in memory)
       </div>
     </div>
   );

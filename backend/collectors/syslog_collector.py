@@ -16,7 +16,7 @@ class FortiGateSyslogCollector:
     subtype="forward" srcip=192.168.1.100 dstip=8.8.8.8 action="accept" ...
     """
     
-    def __init__(self, host: str = "0.0.0.0", port: int = 5514):
+    def __init__(self, host: str = "127.0.0.1", port: int = 5514):
         self.host = host
         self.port = port
         self._transport = None
@@ -102,20 +102,21 @@ class FortiGateSyslogCollector:
             """Called when a UDP packet arrives"""
             try:
                 raw = data.decode('utf-8', errors='replace').strip()
-                
+                logger.info(f"Received syslog from {addr[0]}:{addr[1]} - {len(data)} bytes")
+
                 # Remove syslog header if present (e.g., <134>)
                 if raw.startswith('<'):
                     idx = raw.find('>')
                     if idx > 0:
                         raw = raw[idx+1:].strip()
-                
+
                 # Parse the log
                 log_entry = self.collector.parse_fortigate_log(raw)
                 log_entry['source_ip'] = addr[0]
-                
+
                 # Notify callbacks
                 asyncio.create_task(self.collector._notify(log_entry))
-                
+
             except Exception as e:
                 logger.error(f"Failed to parse syslog: {e}")
         

@@ -35,8 +35,8 @@ FIREWALLS = [
         "port": 5514,
     },
     {
-        "id": "fg60f-17th",
-        "name": "FortiGate-60F 17th",
+        "id": "fg40f-17th",
+        "name": "FortiGate-40F 17th",
         "port": 5515,
     },
 ]

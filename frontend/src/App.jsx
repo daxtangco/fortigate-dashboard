@@ -106,8 +106,7 @@ function App() {
 
   const handleSelectFirewall = (fw) => {
     localStorage.setItem('selectedFirewall', JSON.stringify(fw));
-    // Refresh page to ensure clean WebSocket connection
-    window.location.reload();
+    setSelectedFirewall(fw);
   };
 
   const handleSwitchFirewall = () => {
